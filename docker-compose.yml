@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  postgres:
+    hostname: ${POSTGRES_HOST}
+    container_name: ${POSTGRES_HOST}
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -d ranger -U ranger"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  trino:
+    image: trinodb/trino:433
+    container_name: trino
+    hostname: trino
+    ports:
+      - "8888:8080"
+    networks:
+      - internal
+    volumes:
+      - ${PWD}/trino/pg.properties:/etc/trino/catalog/pg.properties
+
+volumes:
+  postgres-data:
+
+networks:
+  internal:
+    ipam:
+      driver: default
+      config:
+        - subnet: ${INTERNAL_SUBNET}
+  www:
