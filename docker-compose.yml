@@ -226,6 +226,7 @@ services:
     volumes:
       - ${PWD}/secrets/gcp-sa.json:/opt/gcp/secrets/service-account.json
       - ${PWD}/hive/hive-site.xml:/opt/bitnami/spark/conf/hive-site.xml
+      - ${PWD}/scripts/spark-submit.sh:/opt/hudi/spark/runner/spark-submit.sh
     depends_on:
       hive-server:
         condition: service_healthy
