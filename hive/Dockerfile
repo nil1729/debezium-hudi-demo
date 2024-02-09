@@ -14,7 +14,7 @@ ENV PATH=$PATH:$HADOOP_HOME/bin:$HIVE_HOME/bin
 
 # Install necessary packages
 RUN apt-get update && \
-  apt-get install -y wget tar netcat && \
+  apt-get install -y wget tar netcat procps && \
   rm -rf /var/lib/apt/lists/*
 
 # Download and install Hadoop
