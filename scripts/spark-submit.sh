@@ -29,4 +29,15 @@ spark-submit \
   --hoodie-conf hoodie.deltastreamer.source.kafka.topic=pg_cdc_hudi.public.tpcds_customer \
   --hoodie-conf auto.offset.reset=earliest \
   --hoodie-conf hoodie.datasource.write.recordkey.field="c_customer_id" \
-  --hoodie-conf hoodie.datasource.write.partitionpath.field="c_birth_country"
+  --hoodie-conf hoodie.datasource.write.partitionpath.field="c_birth_country" \
+  --enable-sync \
+  --hoodie-conf hoodie.datasource.hive_sync.enable=true \
+  --hoodie-conf hoodie.datasource.hive_sync.mode=hms \
+  --hoodie-conf hoodie.datasource.hive_sync.sync_as_datasource=false \
+  --hoodie-conf hoodie.datasource.hive_sync.database=hudi \
+  --hoodie-conf hoodie.datasource.hive_sync.table=tpcds_customer \
+  --hoodie-conf hoodie.datasource.hive_sync.use_jdbc=false \
+  --hoodie-conf hoodie.datasource.hive_sync.partition_fields=c_birth_country \
+  --hoodie-conf hoodie.datasource.hive_sync.partition_extractor_class=org.apache.hudi.hive.MultiPartKeysValueExtractor \
+  --hoodie-conf hoodie.datasource.write.hive_style_partitioning=true \
+  --hoodie-conf hoodie.datasource.hive_sync.metastore.uris=thrift://hive-server:9083

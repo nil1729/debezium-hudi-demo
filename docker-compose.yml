@@ -161,26 +161,6 @@ services:
     networks:
       internal:
 
-  spark:
-    hostname: spark
-    container_name: spark
-    build:
-      context: ${PWD}/spark
-      dockerfile: Dockerfile
-    networks:
-      internal:
-    environment:
-      - SPARK_MODE=master
-    ports:
-      - "8888:8080"
-      - "7777:7077"
-      - "4040-4050:4040-4050"
-    volumes:
-      - ${PWD}/secrets/gcp-sa.json:/opt/gcp/secrets/service-account.json
-    depends_on:
-      hive-server:
-        condition: service_healthy
-
   hive-metastore-db:
     container_name: hive-metastore-db
     hostname: hive-metastore-db
@@ -228,6 +208,27 @@ services:
       interval: 10s
       retries: 5
       timeout: 5s
+
+  spark:
+    hostname: spark
+    container_name: spark
+    build:
+      context: ${PWD}/spark
+      dockerfile: Dockerfile
+    networks:
+      internal:
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "8888:8080"
+      - "7777:7077"
+      - "4040-4050:4040-4050"
+    volumes:
+      - ${PWD}/secrets/gcp-sa.json:/opt/gcp/secrets/service-account.json
+      - ${PWD}/hive/hive-site.xml:/opt/bitnami/spark/conf/hive-site.xml
+    depends_on:
+      hive-server:
+        condition: service_healthy
 
 volumes:
   postgres-data:
