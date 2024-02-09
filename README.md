@@ -11,9 +11,12 @@ This project is a simple demo to show how to use Debezium (Kafka Connect) with A
 
 ### Acknowledgements
 
-- [Change Data Capture with Debezium and Apache Hudi](https://hudi.apache.org/blog/2022/01/14/change-data-capture-with-debezium-and-apache-hudi/)
+- Change Data Capture with Debezium and Apache Hudi. [Hudi Blog](https://hudi.apache.org/blog/2022/01/14/change-data-capture-with-debezium-and-apache-hudi/)
 - Kafka deployment with docker compose - [Github](https://github.com/confluentinc/cp-demo/blob/7.5.1-post/docker-compose.yml)
-- Avro Serialization with Confluent schema registry - [Debezium Docs](https://debezium.io/documentation/reference/stable/configuration/avro.html)
+- Debezium Avro Serialization with Confluent schema registry - [Debezium Docs](https://debezium.io/documentation/reference/stable/configuration/avro.html)
+- Debezium image support for Confluent schema registry - [Article Link](https://dev.to/lazypro/making-debezium-2x-support-confluent-schema-registry-3mf2)
+
+---
 
 ### Running the project locally
 
@@ -63,7 +66,7 @@ This project is a simple demo to show how to use Debezium (Kafka Connect) with A
 docker-compose up -d
 ```
 
-![Docker Compose Status](image.png)
+![Docker Compose Status](assets/image.png)
 
 #### Insert data into OLTP database (postgres) through Trino
 
@@ -100,5 +103,29 @@ INSERT INTO pg.public.tpcds_customer
 #### Submit spark job to write data to Hudi
 
 ```bash
-./scripts/spark-submit.sh
+docker exec -it spark /opt/hudi/spark/runner/spark-submit.sh
 ```
+
+Monitor spark job status at `http://localhost:4040`
+
+#### Query Hudi table using Trino
+
+```bash
+trino --server http://localhost:8080 --catalog hudi --schema hudi
+```
+
+```sql
+SELECT COUNT(*), c_birth_country
+FROM hudi.hudi.tpcds_customer
+GROUP BY c_birth_country;
+```
+
+#### Clean up the services and volumes
+
+```bash
+docker-compose down --remove-orphans --volumes
+```
+
+---
+
+Made with ❤️ by [nil1729](https://github.com/nil1729)
