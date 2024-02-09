@@ -175,9 +175,60 @@ services:
       - "4040-4050:4040-4050"
     volumes:
       - ${PWD}/secrets/gcp-sa.json:/opt/gcp/secrets/service-account.json
+    depends_on:
+      hive-server:
+        condition: service_healthy
+
+  hive-metastore-db:
+    container_name: hive-metastore-db
+    hostname: hive-metastore-db
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: ${HIVE_METASTORE_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${HIVE_METASTORE_DB_NAME}
+      MYSQL_USER: ${HIVE_METASTORE_DB_USER}
+      MYSQL_PASSWORD: ${HIVE_METASTORE_DB_PASSWORD}
+    volumes:
+      - hive-metastore-db-data:/var/lib/mysql
+    networks:
+      internal:
+        ipv4_address: ${HIVE_METASTORE_DB_IP}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  hive-server:
+    container_name: hive-server
+    hostname: hive-server
+    build:
+      context: ${PWD}/hive
+      dockerfile: Dockerfile
+      args:
+        - HIVE_VERSION=${HIVE_VERSION}
+        - HADOOP_VERSION=${HADOOP_VERSION}
+    depends_on:
+      hive-metastore-db:
+        condition: service_healthy
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+      - HIVE_HOME=/opt/hive
+    volumes:
+      - ${PWD}/secrets/gcp-sa.json:/opt/gcp/secrets/service-account.json
+      - ${PWD}/hive/hive-site.xml:/opt/hive/conf/hive-site.xml
+      - ${PWD}/hive/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+    networks:
+      internal:
+    healthcheck:
+      test: ["CMD-SHELL", "nc -zv localhost 9083 || exit 1"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
 volumes:
   postgres-data:
+  hive-metastore-db-data:
 
 networks:
   internal:

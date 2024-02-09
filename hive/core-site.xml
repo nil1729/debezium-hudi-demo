@@ -1,0 +1,25 @@
+<configuration>
+    <property>
+        <name>fs.gs.impl</name>
+        <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem</value>
+        <description>The File System for 'gs:' URIs.</description>
+    </property>
+    <property>
+        <name>fs.AbstractFileSystem.gs.impl</name>
+        <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
+        <description>The Abstract File System for 'gs:' URIs.</description>
+    </property>
+    <property>
+        <name>fs.gs.project.id</name>
+        <value>pwa-demo-nil1729</value>
+    </property>
+    <property>
+        <name>google.cloud.auth.type</name>
+        <value>SERVICE_ACCOUNT_JSON_KEYFILE</value>
+        <description>Authentication type to use for GCS access.</description>
+    </property>
+    <property>
+        <name>google.cloud.auth.service.account.json.keyfile</name>
+        <value>/opt/gcp/secrets/service-account.json</value>
+    </property>
+</configuration>
