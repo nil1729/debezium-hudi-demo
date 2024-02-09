@@ -1,32 +1,32 @@
 #!/bin/bash
 
-spark-submit \  
-  --packages org.apache.hudi:hudi-spark3.3-bundle_2.12:0.14.0 \  
-  --conf spark.serializer=org.apache.spark.serializer.KryoSerializer \  
-  --conf spark.sql.hive.convertMetastoreParquet=false \  
-  --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \  
-  --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \  
-  --conf spark.hadoop.fs.gs.auth.service.account.enable=true \  
-  --conf spark.hadoop.google.cloud.auth.service.account.json.keyfile=/opt/gcp/secrets/service-account.json \  
-  --conf spark.hadoop.datanucleus.autoCreateSchema=true \  
-  --conf spark.hadoop.datanucleus.fixedDatastore=false \  
-  --conf spark.hadoop.datanucleus.autoCreateSchema=true \  
-  --conf spark.hadoop.datanucleus.autoCreateSchema=true \  
-  --driver-class-path file:///opt/hudi/spark/jars/mysql-connector-java-8.0.28.jar \  
-  --jars "file:///opt/hudi/spark/jars/mysql-connector-java-8.0.28.jar,file:///opt/hudi/spark/jars/gcs-connector-hadoop2-latest.jar,file:///opt/hudi/spark/jars/hudi-utilities-bundle_2.12-0.10.0.jar,file:///opt/hudi/spark/jars/spark-avro_2.12-3.0.1.jar" \  
-  --class org.apache.hudi.utilities.deltastreamer.HoodieDeltaStreamer /tmp/spark/jars/hudi-utilities-bundle_2.12-0.10.0.jar \  
-  --table-type COPY_ON_WRITE --op UPSERT \  
-  --target-base-path gs://trino-hive-demo/hudi/cdc/pg_table_accounts \  
-  --target-table pg_table_accounts --continuous \  
-  --min-sync-interval-seconds 60 \  
-  --source-class org.apache.hudi.utilities.sources.debezium.PostgresDebeziumSource \  
-  --source-ordering-field _event_lsn \  
-  --payload-class org.apache.hudi.common.model.debezium.PostgresDebeziumAvroPayload \  
-  --hoodie-conf schema.registry.url=http://schema-registry:8081 \  
-  --hoodie-conf bootstrap.servers=kafka:29092 \  
-  --hoodie-conf hoodie.deltastreamer.schemaprovider.registry.url=http://schema-registry:8081/subjects/pg_cdc_hudi.public.tpcds_customer-value/versions/latest \  
-  --hoodie-conf hoodie.deltastreamer.source.kafka.value.deserializer.class=io.confluent.kafka.serializers.KafkaAvroDeserializer \  
-  --hoodie-conf hoodie.deltastreamer.source.kafka.topic=pg_cdc_hudi.public.tpcds_customer \  
-  --hoodie-conf auto.offset.reset=earliest \  
-  --hoodie-conf hoodie.datasource.write.recordkey.field="c_customer_id" \  
+spark-submit \
+  --packages org.apache.hudi:hudi-spark3.3-bundle_2.12:0.14.0 \
+  --conf spark.serializer=org.apache.spark.serializer.KryoSerializer \
+  --conf spark.sql.hive.convertMetastoreParquet=false \
+  --conf spark.hadoop.fs.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem \
+  --conf spark.hadoop.fs.AbstractFileSystem.gs.impl=com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS \
+  --conf spark.hadoop.fs.gs.auth.service.account.enable=true \
+  --conf spark.hadoop.google.cloud.auth.service.account.json.keyfile=/opt/gcp/secrets/service-account.json \
+  --conf spark.hadoop.datanucleus.autoCreateSchema=true \
+  --conf spark.hadoop.datanucleus.fixedDatastore=false \
+  --conf spark.hadoop.datanucleus.autoCreateSchema=true \
+  --conf spark.hadoop.datanucleus.autoCreateSchema=true \
+  --driver-class-path file:///opt/hudi/spark/jars/mysql-connector-java-8.0.28.jar \
+  --jars "file:///opt/hudi/spark/jars/mysql-connector-java-8.0.28.jar,file:///opt/hudi/spark/jars/gcs-connector-hadoop2-latest.jar,file:///opt/hudi/spark/jars/hudi-utilities-bundle_2.12-0.10.0.jar,file:///opt/hudi/spark/jars/spark-avro_2.12-3.0.1.jar" \
+  --class org.apache.hudi.utilities.deltastreamer.HoodieDeltaStreamer /opt/hudi/spark/jars/hudi-utilities-bundle_2.12-0.10.0.jar \
+  --table-type COPY_ON_WRITE --op UPSERT \
+  --target-base-path gs://trino-hive-demo/hudi/cdc/tpcds_customer \
+  --target-table tpcds_customer --continuous \
+  --min-sync-interval-seconds 60 \
+  --source-class org.apache.hudi.utilities.sources.debezium.PostgresDebeziumSource \
+  --source-ordering-field _event_lsn \
+  --payload-class org.apache.hudi.common.model.debezium.PostgresDebeziumAvroPayload \
+  --hoodie-conf schema.registry.url=http://schema-registry:8081 \
+  --hoodie-conf bootstrap.servers=kafka:29092 \
+  --hoodie-conf hoodie.deltastreamer.schemaprovider.registry.url=http://schema-registry:8081/subjects/pg_cdc_hudi.public.tpcds_customer-value/versions/latest \
+  --hoodie-conf hoodie.deltastreamer.source.kafka.value.deserializer.class=io.confluent.kafka.serializers.KafkaAvroDeserializer \
+  --hoodie-conf hoodie.deltastreamer.source.kafka.topic=pg_cdc_hudi.public.tpcds_customer \
+  --hoodie-conf auto.offset.reset=earliest \
+  --hoodie-conf hoodie.datasource.write.recordkey.field="c_customer_id" \
   --hoodie-conf hoodie.datasource.write.partitionpath.field="c_birth_country"
