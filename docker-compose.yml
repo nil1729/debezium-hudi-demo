@@ -173,6 +173,8 @@ services:
       - "8888:8080"
       - "7777:7077"
       - "4040-4050:4040-4050"
+    volumes:
+      - ${PWD}/secrets/gcp-sa.json:/opt/gcp/secrets/service-account.json
 
 volumes:
   postgres-data:
