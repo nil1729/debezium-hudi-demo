@@ -118,7 +118,7 @@ services:
       CONFLUENT_METRICS_ENABLE: "false"
       PORT: 9021
     networks:
-      - zoo-kafka-net
+      internal:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9021/health"]
       interval: 30s
