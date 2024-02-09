@@ -5,10 +5,12 @@ services:
     hostname: ${POSTGRES_HOST}
     container_name: ${POSTGRES_HOST}
     image: postgres:latest
+    restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    command: ["postgres", "-c", "wal_level=logical"]
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
@@ -24,7 +26,7 @@ services:
     container_name: trino
     hostname: trino
     ports:
-      - "8888:8080"
+      - "8080:8080"
     networks:
       - internal
     volumes:
@@ -93,6 +95,35 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:7.0.1
+    hostname: control-center
+    container_name: control-center
+    depends_on:
+      kafka:
+        condition: service_healthy
+      schema-registry:
+        condition: service_healthy
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: "kafka:29092"
+      CONTROL_CENTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      CONFLUENT_METRICS_ENABLE: "false"
+      PORT: 9021
+    networks:
+      - zoo-kafka-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9021/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   debezium:
     build:
