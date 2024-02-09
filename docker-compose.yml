@@ -222,6 +222,7 @@ services:
       - ${PWD}/hive/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
     networks:
       internal:
+        ipv4_address: ${HIVE_SERVER_IP}
     healthcheck:
       test: ["CMD-SHELL", "nc -zv localhost 9083 || exit 1"]
       interval: 10s
