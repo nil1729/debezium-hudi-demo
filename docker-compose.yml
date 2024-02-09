@@ -31,6 +31,8 @@ services:
       - internal
     volumes:
       - ${PWD}/trino/pg.properties:/etc/trino/catalog/pg.properties
+      - ${PWD}/trino/hudi.properties:/etc/trino/catalog/hudi.properties
+      - ${PWD}/secrets/gcp-sa.json:/opt/gcp/secrets/service-account.json
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
